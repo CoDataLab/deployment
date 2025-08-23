@@ -1,0 +1,350 @@
+[
+    {
+        "source": "BBC News",
+        "url": "https://feeds.bbci.co.uk/news/rss.xml"
+    },
+    {
+        "source": "CNN",
+        "url": "http://rss.cnn.com/rss/edition.rss"
+    },
+    {
+        "source": "The Guardian",
+        "url": "https://www.theguardian.com/world/rss"
+    },
+    {
+        "source": "New York Times",
+        "url": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+    },
+    {
+        "source": "NPR News",
+        "url": "https://www.npr.org/rss/rss.php?id=1001"
+    },
+    {
+        "source": "Al Jazeera",
+        "url": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+        "source": "Forbes",
+        "url": "https://www.forbes.com/real-time/feed2/"
+    },
+    {
+        "source": "TechCrunch",
+        "url": "https://feeds.feedburner.com/TechCrunch/"
+    },
+    {
+        "source": "Wired",
+        "url": "https://www.wired.com/feed/rss"
+    },
+    {
+        "source": "Science Daily",
+        "url": "https://www.sciencedaily.com/rss/top/science.xml"
+    },
+    {
+        "source": "ESPN",
+        "url": "https://www.espn.com/espn/rss/news"
+    },
+    {
+        "source": "Financial Times",
+        "url": "https://www.ft.com/?format=rss"
+    },
+    {
+        "source": "The Hill",
+        "url": "https://thehill.com/rss/syndicator/19109"
+    },
+    {
+        "source": "CNET",
+        "url": "https://www.cnet.com/rss/news/"
+    },
+    {
+        "source": "Mashable",
+        "url": "https://mashable.com/feed/"
+    },
+    {
+        "source": "Russia in Global Affairs",
+        "url": "https://eng.globalaffairs.ru/feed/"
+    },
+    {
+        "source": "The Independent",
+        "url": "https://www.independent.co.uk/news/world/rss"
+    },
+    {
+        "source": "The Russian Government",
+        "url": "http://government.ru/en/all/rss/"
+    },
+    {
+        "source": "The Washington Post",
+        "url": "https://feeds.washingtonpost.com/rss/world"
+    },
+    
+    {
+        "source": "The Telegraph",
+        "url": "https://www.telegraph.co.uk/rss"
+    },
+    {
+        "source": "The Moscow Times",
+        "url": "https://themoscowtimes.com/rss/news"
+    },
+    {
+        "source": "RT (Russia Today)",
+        "url": "https://rt.com/rss"
+    },
+    {
+        "source": "TASS",
+        "url": "https://tass.com/rss/v2.xml"
+    },
+    {
+        "source": "RIA Novosti",
+        "url": "https://ria.ru/export/rss2/index.xml"
+    },
+
+    {
+        "source": "Palestine News Network",
+        "url": "http://english.pnn.ps/feed"
+    },
+    {
+        "source": "Al-Quds Al-Arabi",
+        "url": "https://www.alquds.co.uk/feed/"
+    },
+    {
+        "source": "Al Jazeera",
+        "url": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+        "source": "Middle East Eye",
+        "url": "https://www.middleeasteye.net/rss"
+    },
+    {
+        "source": "France 24",
+        "url": "https://www.france24.com/en/rss"
+    },
+    {
+        "source": "TechCrunch",
+        "url": "https://feeds.feedburner.com/TechCrunch/"
+    },
+    {
+        "source": "The Verge",
+        "url": "https://www.theverge.com/tech/rss/index.xml"
+    },
+    {
+        "source": "Skift",
+        "url": "https://skift.com/feed/"
+    },
+    {
+        "source": "CNBC",
+        "url": "https://www.cnbc.com/id/10001147/device/rss/rss.html"
+    },
+    {
+    "source": "The West Australian",
+    "url": "https://thewest.com.au/rss"
+    },
+        {
+        "source": "ABC News",
+        "url": "https://abcnews.go.com/abcnews/internationalheadlines"
+    },
+    {
+        "source": "Fox News",
+        "url": "https://moxie.foxnews.com/google-publisher/latest.xml"
+    } ,
+      {
+        "source": "Times of India",
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms"
+    },
+    {
+        "source": " The Sun",
+        "url": "https://www.thesun.co.uk/news/worldnews/feed/"
+    }  
+    ,
+    {
+        "source": "Daily Mirror",
+        "url": "https://www.mirror.co.uk/news/world-news/?service=rss"
+    }  ,    {
+        "source": "News24",
+        "url": "https://feeds.capi24.com/v1/Search/articles/news24/World/rss"
+    }  ,    {
+        "source": "Watchdog Uganda",
+        "url": "https://www.watchdoguganda.com/feed"
+    }  ,    {
+        "source": "South China Morning Post",
+        "url": "https://www.scmp.com/rss/91/feed"
+    } ,
+    {
+        "source": "NDTV",
+        "url": "https://feeds.feedburner.com/NDTV-LatestNews"
+    } ,
+     {
+        "source": "India Today",
+        "url": "https://www.indiatoday.in/rss/1206578"
+    } ,
+    {
+       "source": "The Indian Express",
+       "url": "https://indianexpress.com/feed/"
+   } ,
+   {
+      "source": "Deutschland.de",
+      "url": "https://www.deutschland.de/en/feed-news/rss.xml"
+    } ,
+    {
+        "source": "DER SPIEGEL",
+        "url": "https://www.spiegel.de/international/index.rss"
+    } ,
+    {
+        "source": "JUNGE FREIHEIT",
+        "url": "https://jungefreiheit.de/feed/"
+    } ,
+     
+    {
+        "source": "Fortune",
+        "url": "https://fortune.com/feed/fortune-feeds/?id=3230629"
+      },
+      {
+       "source": "Investing.com",
+       "url": "https://www.investing.com/rss/news.rss"
+        } 
+        ,
+        {
+         "source": "Economic Times",
+         "url": "https://economictimes.indiatimes.com/rssfeedsdefault.cms"
+       },
+        {
+            "source": "Yahoo Finance",
+            "url": "https://finance.yahoo.com/news/rssindex"
+        },
+        {
+            "source": "Business Today",
+            "url": "https://www.businesstoday.in/rssfeeds/?id=225346"
+        },
+        {
+            "source": "The Hindu BusinessLine",
+            "url": "https://www.thehindubusinessline.com/?service=rss"
+        } 
+        ,
+        {
+            "source": "MJBizDaily",
+            "url": "https://mjbizdaily.com/feed/"
+        },
+        {
+            "source": "ComputerWeekly",
+            "url": "https://www.computerweekly.com/rss/All-Computer-Weekly-content.xml"
+        } 
+        ,
+        {
+            "source": "ComputerWeekly’s ",
+            "url": "https://www.fingent.com/feed/"
+        } ,
+        {
+            "source": "TechRepublic ",
+            "url": "https://www.techrepublic.com/rssfeeds/articles/?feedType=rssfeeds"
+        } ,
+         {
+            "source": " ZDNet ",
+            "url": "https://www.zdnet.com/news/rss.xml"
+        } 
+        ,
+        {
+        "source": "Africanews",
+        "url": "https://www.africanews.com/feed/rss"
+        } 
+        , {
+        "source": "Africa.com",
+        "url": "https://www.africa.com/feed/"
+        }
+        ,{
+            "source": "Wellness Mama®",
+            "url": "https://wellnessmama.com/feed/"
+         }  ,{
+            "source": "Precision Nutrition",
+            "url": "https://www.precisionnutrition.com/blog/feed"
+         },
+        {
+            "source": "Middle East Monitor",
+            "url": "https://middleeastmnt.disqus.com/latest.rss"
+        },
+        {
+            "source": "Al-Monitor",
+            "url": "https://www.al-monitor.com/rss"
+        },
+        {
+            "source": "Al Bawaba",
+            "url": "https://www.albawaba.com/rss/all"
+        },
+        {
+            "source": "Egyptian Streets",
+            "url": "https://egyptianstreets.com/feed/"
+        },
+          
+        {
+            "source": "Middle East News 247",
+            "url": "https://menews247.com/feed/"
+        },
+        {
+            "source": "Palestine Chronicle",
+            "url": "https://www.palestinechronicle.com/feed/"
+        },
+          
+        {
+            "source": "Middle East Eye",
+            "url": "https://www.middleeasteye.net/rss"
+        },
+          
+        {
+            "source": "Qunfuz",
+            "url": "https://qunfuz.com/feed/"
+        },
+        
+      {
+        "source": "BusinessWorld Online",
+        "url": "https://www.bworldonline.com/feed/"
+      },
+      {
+        "source": "Eagle News",
+        "url": "https://www.eaglenews.ph/feed/"
+      },
+      {
+        "source": "RAPPLER",
+        "url": "https://www.rappler.com/feed/"
+      },
+      {
+        "source":"MercoPress",
+        "url":"https://en.mercopress.com/rss/brazil"
+       },
+       {
+        "source":"Tempo",
+        "url":"https://tempo.com.ph/feed/"
+       },
+       {
+        "source":"brazilnews.net",
+        "url":"http://feeds.brazilnews.net/rss/24437442923341f1"
+       }
+       ,
+       {
+        "source":"The New York Times",
+        "url":"https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/topic/destination/brazil/rss.xml"
+       } ,
+       {
+        "source":"BELTA",
+        "url":"https://eng.belta.by/rss"
+       }
+       ,
+       {
+        "source":"The Local Germany",
+        "url":"https://feeds.thelocal.com/rss/de"
+       }
+       ,
+       {
+        "source":"The Local Switzerland",
+        "url":"https://feeds.thelocal.com/rss/ch"
+       }
+       ,
+       {
+        "source":"The Local Italy",
+        "url":"https://feeds.thelocal.com/rss/it"
+       }
+       ,
+       {
+        "source":"The Local France",
+        "url":"https://feeds.thelocal.com/rss/fr"
+       }
+    
+
+
+]

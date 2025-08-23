@@ -1,0 +1,20 @@
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Outer ring */}
+    <circle cx="12" cy="12" r="10" stroke="black" strokeWidth="1" fill="white" />
+    
+    {/* Center point */}
+    <circle cx="12" cy="12" r="1" fill="black" />
+    
+    {/* Scale markings (manual addition) */}
+    <line x1="12" y1="12" x2="22" y2="12" stroke="black" strokeWidth="1" />
+    <line x1="12" y1="12" x2="12 + 8.66" y2="12 + 5" stroke="black" strokeWidth="1" />
+    {/* Add more lines as needed for additional markings */}
+    
+    {/* Needle rotated at 45 degrees */}
+    <polygon points="12,12 16,8 12,10" fill="red" transform="rotate(45 12 12)" />
+  </svg>
