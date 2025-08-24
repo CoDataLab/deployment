@@ -1,6 +1,9 @@
+version: "3.9"
+
 services:
   mongo:
     image: mongo:latest
+    container_name: mongo
     restart: always
     ports:
       - "27017:27017"
@@ -13,11 +16,11 @@ services:
       MONGO_INITDB_ROOT_USERNAME: badisjl99
       MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongo", "-u", "badisjl99", "-p", "123951Ba008", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   backend:
     build:
