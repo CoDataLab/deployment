@@ -4,39 +4,55 @@ const {createGroupsForAllCategories }= require('../utils/sourceGrouper')
 const express = require('express');
 const router = express.Router();
 
+const NodeCache = require('node-cache');
+
+// Create cache instance with 3 min TTL (time-to-live)
+const cache = new NodeCache({ stdTTL: 180 });
+
+
 
 router.get('/all', async (req, res) => {
-    try {
-        const sources = await Source.find();
-        const allSourceIds = sources.map(source => source._id);
-        const totalCount = sources.length;
-        
-       let allSourcesGroup = await SourceGroup.findOne({ name: 'All Sources' });
-        if (allSourcesGroup) {
-            allSourcesGroup.sourceIds = allSourceIds;
-            allSourcesGroup.totalCount = totalCount;
-            allSourcesGroup.markModified('sourceIds');
-            allSourcesGroup.markModified('totalCount');
-            await allSourcesGroup.save();
-        } else {
-            allSourcesGroup = new SourceGroup({
-                name: 'All Sources',
-                sourceIds: allSourceIds,
-                totalCount: totalCount
-            });
-            await allSourcesGroup.save();
-        }
-
-        await createGroupsForAllCategories();
-
-        const groups = await SourceGroup.find().populate('sourceIds');
-
-        res.json({ message: 'Source groups retrieved successfully.', groups });
-    } catch (error) {
-        console.error('Error fetching source groups:', error.message);
-        res.status(500).json({ message: 'Failed to fetch source groups.', error });
+  try {
+    // Check cache
+    const cachedGroups = cache.get("allSourceGroups");
+    if (cachedGroups) {
+      return res.json({ message: 'Source groups retrieved successfully. (cached)', groups: cachedGroups });
     }
+
+    const sources = await Source.find();
+    const allSourceIds = sources.map(source => source._id);
+    const totalCount = sources.length;
+        
+    let allSourcesGroup = await SourceGroup.findOne({ name: 'All Sources' });
+    if (allSourcesGroup) {
+      allSourcesGroup.sourceIds = allSourceIds;
+      allSourcesGroup.totalCount = totalCount;
+      allSourcesGroup.markModified('sourceIds');
+      allSourcesGroup.markModified('totalCount');
+      await allSourcesGroup.save();
+    } else {
+      allSourcesGroup = new SourceGroup({
+        name: 'All Sources',
+        sourceIds: allSourceIds,
+        totalCount: totalCount
+      });
+      await allSourcesGroup.save();
+    }
+
+    await createGroupsForAllCategories();
+
+    const groups = await SourceGroup.find().populate('sourceIds');
+
+    // Save to cache with 3 min TTL
+    cache.set("allSourceGroups", groups);
+
+    res.json({ message: 'Source groups retrieved successfully.', groups });
+  } catch (error) {
+    console.error('Error fetching source groups:', error.message);
+    res.status(500).json({ message: 'Failed to fetch source groups.', error });
+  }
 });
+
 
 router.post('/add-group', async (req, res) => {
     try {
