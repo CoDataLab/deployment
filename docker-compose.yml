@@ -34,21 +34,24 @@ services:
       COOKIE_NAME: token
 
   web:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: web
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/www/certbot
-    networks:
-      - app-network
+  build:
+    context: ./frontend
+    dockerfile: Dockerfile
+    args:
+      VITE_API_URL: https://codatalab.cloud/api
+      VITE_NODE_ENV: production
+  container_name: web
+  restart: unless-stopped
+  depends_on:
+    - backend
+  ports:
+    - "80:80"
+    - "443:443"
+  volumes:
+    - certbot-etc:/etc/letsencrypt
+    - certbot-var:/var/www/certbot
+  networks:
+    - app-network
 
   certbot:
     image: certbot/certbot:latest
