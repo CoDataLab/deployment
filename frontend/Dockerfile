@@ -4,7 +4,11 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
-# make sure .env.production is present or rely on VITE_ vars at build time
+
+ARG VITE_API_URL
+ARG VITE_NODE_ENV
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_NODE_ENV=$VITE_NODE_ENV
 RUN yarn build
 
 # ---- nginx to serve + reverse proxy ----
