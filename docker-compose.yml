@@ -1,72 +1,68 @@
-version: "3.9"
+version: '3.8'
 
 services:
   mongo:
     image: mongo:latest
+    container_name: mern-mongo
     restart: always
-    ports:
-      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     volumes:
       - mongo-data:/data/db
     networks:
-      - app-network
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: badisjl99
-      MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
+      - mern-network
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend
-    restart: unless-stopped
+    container_name: mern-backend
+    restart: always
+    environment:
+      PORT: 8082
+      MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongo:27017/your_db_name?authSource=admin # <-- CHANGE your_db_name
+      # Add any other backend environment variables here
     depends_on:
       - mongo
-    ports:
-      - "8082:8082"
     networks:
-      - app-network
-    environment:
-      NODE_ENV: production
-      PORT: 8082
-      MONGO_URI: mongodb://mongo:27017/mydb
-      JWT_SECRET: BFEec8JKk:FZz3f0F812f.0051293f
-      COOKIE_NAME: token
+      - mern-network
 
-  web:
+  frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_HOST_API: https://codatalab.cloud/api
-        
-    container_name: web
-    restart: unless-stopped
-    depends_on:
-      - backend
+    container_name: mern-frontend
+    restart: always
+    networks:
+      - mern-network
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: mern-nginx
+    restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/www/certbot
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - backend
+      - frontend
     networks:
-      - app-network
+      - mern-network
 
   certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
+    image: certbot/certbot
+    container_name: mern-certbot
     volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/www/certbot
-    networks:
-      - app-network
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+
+networks:
+  mern-network:
+    driver: bridge
 
 volumes:
   mongo-data:
-  certbot-etc:
-  certbot-var:
-
-networks:
-  app-network:
-    driver: bridge
+    driver: local
