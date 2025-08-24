@@ -12,6 +12,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: badisjl99
       MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build:
