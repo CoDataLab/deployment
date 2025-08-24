@@ -14,21 +14,27 @@ services:
         MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend
-    restart: unless-stopped
-    env_file:
-      - ./backend/.env
-    depends_on:
-      - mongo
-    expose:
-      - "8082"
-    ports:
-      - "8082:8082"
-    networks:
-      - app-net
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  container_name: backend
+  restart: unless-stopped
+  depends_on:
+    - mongo
+  expose:
+    - "8082"
+  ports:
+    - "8082:8082"
+  networks:
+    - app-net
+  environment:
+    NODE_ENV: production
+    PORT: 8082
+    MONGO_URI: mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin
+    JWT_SECRET: BFEec8JKk:FZz3f0F812f.0051293f
+    COOKIE_NAME: token
+
+    
 
   web:
     build:
