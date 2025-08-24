@@ -3,7 +3,6 @@ version: "3.9"
 services:
   mongo:
     image: mongo:latest
-    container_name: mongo
     restart: always
     ports:
       - "27017:27017"
@@ -15,12 +14,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: badisjl99
       MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
-    healthcheck:
-      test: ["CMD", "mongo", "-u", "badisjl99", "-p", "123951Ba008", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
   backend:
     build:
@@ -29,8 +22,7 @@ services:
     container_name: backend
     restart: unless-stopped
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     expose:
       - "8082"
     ports:
@@ -40,7 +32,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8082
-      MONGO_URI: mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin
+      MONGO_URI: mongodb://badisjl99:123951Ba008@51.91.249.118:27017/mydb
       JWT_SECRET: BFEec8JKk:FZz3f0F812f.0051293f
       COOKIE_NAME: token
 
@@ -51,8 +43,7 @@ services:
     container_name: web
     restart: unless-stopped
     depends_on:
-      backend:
-        condition: service_started
+      - backend
     ports:
       - "80:80"
       - "443:443"
