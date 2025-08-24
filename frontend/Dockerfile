@@ -20,7 +20,7 @@ RUN yarn build
 FROM nginx:stable-alpine
 
 # Copy the built static files from the builder stage
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx will automatically serve the index.html file from this directory
 # Expose port 80
