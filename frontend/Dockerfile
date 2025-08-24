@@ -5,10 +5,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
 
-ARG VITE_API_URL
-ARG VITE_NODE_ENV
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_NODE_ENV=$VITE_NODE_ENV
+
 RUN yarn build
 
 # ---- nginx to serve + reverse proxy ----
