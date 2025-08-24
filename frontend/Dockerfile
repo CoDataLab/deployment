@@ -1,20 +1,23 @@
-FROM node:18 as build
+# ---- build Vite app ----
+FROM node:18-alpine AS build
 WORKDIR /app
-COPY package*.json ./
-RUN yarn install
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 COPY . .
-# Build the React app
+# make sure .env.production is present or rely on VITE_ vars at build time
 RUN yarn build
 
-# Stage 2: Serve with Nginx
-FROM nginx:stable-alpine
-# Remove default Nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
-# Copy built assets from build stage
+# ---- nginx to serve + reverse proxy ----
+FROM nginx:1.27-alpine
+
+# initial config = HTTP only (80). We'll swap to SSL config after issuing cert.
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+# Vite build output (usually "dist")
 COPY --from=build /app/dist /usr/share/nginx/html
-# Set permissions
-RUN chmod -R 755 /usr/share/nginx/html
-# Expose port 80
+
+# share webroot with certbot for http-01 challenges
+RUN mkdir -p /var/www/certbot
+# Do not bake certs in image; mount them from volumes
 EXPOSE 80
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx","-g","daemon off;"]
