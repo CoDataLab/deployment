@@ -1,120 +1,82 @@
-version: '3.8'
+version: '3'
 
 services:
-  # MongoDB Database Service
-  mongodb:
-    image: mongo:7.0
-    container_name: mern_mongodb
+  db:
+    image: mongo:latest
+    container_name: db
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: adminpassword123
-      MONGO_INITDB_DATABASE: mydb
     volumes:
-      - mongodb_data:/data/db
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-    ports:
-      - "27017:27017"
+      - dbdata:/data/db
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    environment:
+      - MONGO_INITDB_DATABASE=mydb
     networks:
-      - mern_network
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/mydb --quiet
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - app-network
 
-  # Node.js Backend Service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: mern_backend
+    image: mern-backend
+    container_name: backend
     restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PORT=8082
-      - MONGODB_URI=mongodb://badisjl99:123951Ba008@mongodb:27017/mydb
+      - MONGO_URI=mongodb://badisjl99:123951Ba008@db:27017/mydb 
       - JWT_SECRET=BFEec8JKk:FZz3f0F812f.0051293f
-      - CORS_ORIGIN=https://codatalab.cloud
-    ports:
-      - "8082:8082"
+
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - db
     networks:
-      - mern_network
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      - app-network
 
-  # React Frontend Service
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: mern_frontend
-    restart: unless-stopped
-    environment:
-      - VITE_API_URL=https://codatalab.cloud/api
-      - VITE_NODE_ENV=production
-    volumes:
-      - frontend_build:/app/dist
-    networks:
-      - mern_network
-
-  # Nginx Reverse Proxy with SSL
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: mern_nginx
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - frontend_build:/var/www/html:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
-      - ./nginx/logs:/var/log/nginx
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
     depends_on:
       - backend
-      - frontend
     networks:
-      - mern_network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - app-network
 
-  # Certbot for SSL certificates
   certbot:
-    image: certbot/certbot:latest
-    container_name: mern_certbot
+    image: certbot/certbot
+    container_name: certbot
     volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email your-email@example.com -d codatalab.cloud -d www.codatalab.cloud --agree-tos
-    networks:
-      - mern_network
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email badisjlassi86@gmail.com --agree-tos --no-eff-email --force-renewal -d codatalab.cloud -d www.codatalab.cloud  # Replace email; remove www if not needed
 
 volumes:
-  mongodb_data:
+  certbot-etc:
+  certbot-var:
+  web-root:
     driver: local
-  frontend_build:
+    driver_opts:
+      type: none
+      device: /home/ubuntu/codatalab/deployment/frontend/dist  # Replace with absolute path to your frontend/dist folder
+      o: bind
+  dhparam:
     driver: local
+    driver_opts:
+      type: none
+      device: /home/ubuntu/codatalab/deployment/dhparam  # Replace with absolute path to dhparam folder
+      o: bind
+  dbdata:
 
 networks:
-  mern_network:
+  app-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

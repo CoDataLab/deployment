@@ -1,35 +1,19 @@
-# Backend Dockerfile (./backend/Dockerfile)
-FROM node:18-alpine
+# Use official Node 18 image
+FROM node:18
 
-# Install curl for healthcheck
-RUN apk add --no-cache curl
+# Set working directory
+WORKDIR /usr/src/app
 
-# Create app directory
-WORKDIR /app
-
-# Copy package files
+# Copy package files and install dependencies
 COPY package*.json ./
+RUN npm install --production
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
-
-# Copy source code
+# Copy the rest of the application code
 COPY . .
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
-
-# Change ownership
-RUN chown -R nextjs:nodejs /app
-USER nextjs
-
-# Expose port
+# Expose port 8082
 EXPOSE 8082
 
-# Health check endpoint
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8082/health || exit 1
-
-# Start the application
+# Start the backend server
 CMD ["npm", "start"]
+
