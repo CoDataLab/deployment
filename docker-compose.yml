@@ -39,7 +39,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_HOST_API: https://codatalab.cloud/api
-        VITE_NODE_ENV: production
+        
     container_name: web
     restart: unless-stopped
     depends_on:
