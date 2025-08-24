@@ -1,65 +1,45 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    networks:
-      - mern-network
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend
     ports:
       - "8082:8082"
     environment:
-      - VITE_HOST_API=http://backend:8082/api
-      - PORT=8082
-      - MONGO_URI=mongodb://mongodb:27017/mydb
-      - JWT_SECRET=BFEec8JKk:FZz3f0F812f.0051293f
-      - COOKIE_NAME=token
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin 
     depends_on:
-      - mongodb
+      - mongo
     networks:
-      - mern-network
+      - app_network
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
-    environment:
-      - VITE_HOST_API=http://backend:8082/api
-    depends_on:
-      - backend
-    networks:
-      - mern-network
-
-  nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
-    container_name: nginx
     ports:
       - "80:80"
-      - "443:443"
-    depends_on:
-      - frontend
-      - backend
     networks:
-      - mern-network
+      - app_network
 
-volumes:
-  mongo_data:
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: badisjl99 
+      MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
+
 
 networks:
-  mern-network:
+  app_network:
     driver: bridge
 
+volumes:
+  mongo-data:
