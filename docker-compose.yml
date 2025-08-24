@@ -1,13 +1,17 @@
 services:
   mongo:
-    image: mongo:7
-    container_name: mongo
-    restart: unless-stopped
-    volumes:
-      - mongo-data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    networks:
-      - app-net
+      image: mongo:latest
+      restart: always
+      ports:
+        - "27017:27017"
+      volumes:
+        - mongo-data:/data/db
+        - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      networks:
+        - app-net
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: badisjl99
+        MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
 
   backend:
     build:
