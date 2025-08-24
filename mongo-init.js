@@ -4,7 +4,7 @@ db = db.getSiblingDB('mydb');
 
 db.createUser({
   user: 'badis',
-  pwd: '123321@00Pk.3dz?fde07',
+  pwd: '12332.100Pk3dz?fde07',
   roles: [
     {
       role: 'readWrite',
