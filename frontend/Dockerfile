@@ -1,30 +1,20 @@
-# ===== Build Stage =====
-FROM node:18-alpine AS builder
-
+FROM node:18 as build
 WORKDIR /app
-
-# Copy package.json and yarn.lock
-COPY package.json yarn.lock ./
-
-# Install dependencies
+COPY package*.json ./
 RUN yarn install
-
-# Copy the rest of the application source code
 COPY . .
-
-
-ENV VITE_HOST_API=/api
+# Build the React app
 RUN yarn build
 
-# ===== Production Stage =====
+# Stage 2: Serve with Nginx
 FROM nginx:stable-alpine
-
-# Copy the built static files from the builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Nginx will automatically serve the index.html file from this directory
+# Remove default Nginx static assets
+RUN rm -rf /usr/share/nginx/html/*
+# Copy built assets from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
+# Set permissions
+RUN chmod -R 755 /usr/share/nginx/html
 # Expose port 80
 EXPOSE 80
-
-# The default Nginx command will start the server
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

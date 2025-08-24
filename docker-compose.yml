@@ -1,68 +1,63 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mern-mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - mern-network
-
-  backend:
-    build:
-      context: ./backend
-    container_name: mern-backend
-    restart: always
-    environment:
-      PORT: 8082
-      MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongo:27017/your_db_name?authSource=admin # <-- CHANGE your_db_name
-      # Add any other backend environment variables here
-    depends_on:
-      - mongo
-    networks:
-      - mern-network
-
-  frontend:
-    build:
-      context: ./frontend
-    container_name: mern-frontend
-    restart: always
-    networks:
-      - mern-network
-
   nginx:
     image: nginx:stable-alpine
-    container_name: mern-nginx
-    restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - frontend-build:/var/www/react-build
     depends_on:
-      - backend
       - frontend
+      - backend
     networks:
-      - mern-network
+      - app_network
+    restart: always
 
-  certbot:
-    image: certbot/certbot
-    container_name: mern-certbot
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "8082"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin
+      - JWT_SECRET=BFEec8JKk:FZz3f0F812f.0051293f
+      - COOKIE_NAME=token
+    depends_on:
+      - mongo
+    networks:
+      - app_network
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+      - frontend-build:/usr/share/nginx/html
+    networks:
+      - app_network
+    restart: always
 
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017" 
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: badisjl99
+      MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
 networks:
-  mern-network:
+  app_network:
     driver: bridge
-
 volumes:
   mongo-data:
-    driver: local
+  frontend-build:

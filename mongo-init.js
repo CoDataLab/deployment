@@ -1,20 +1,30 @@
+db = db.getSiblingDB('mydb')  // Use 'mydb' database
 
-db = db.getSiblingDB('mydb');
+db.createUser(
+  {
+    user: "myuser",           // Application User
+    pwd:  "securepassword", // Strong Password
+    roles: [
+      { role: "readWrite", db: "mydb" } // Only read/write access to 'mydb'
+    ]
+  }
+);
 
-db.createUser({
-  user: 'badisjl99',
-  pwd: '123951Ba008',
-  roles: [
-    {
-      role: 'readWrite',
-      db: 'mydb'
-    },
-    {
-      role: 'dbAdmin',
-      db: 'mydb'
-    }
-  ]
-});
+// Create another user just for reading (example)
+db.createUser(
+  {
+    user: "readonlyuser",
+    pwd:  "verysecurepassword",
+    roles: [
+      { role: "read", db: "mydb" }
+    ]
+  }
+);
 
-print('Database mydb initialized successfully');
-print('User badisjl99 created with readWrite and dbAdmin roles');
+db.getSiblingDB('admin').createUser(
+  {
+    user: "admin",
+    pwd: "supersecureadminpassword",
+    roles: [ { role: "root", db: "admin" } ]
+  }
+);
