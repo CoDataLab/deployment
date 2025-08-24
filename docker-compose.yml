@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   nginx:
     image: nginx:stable-alpine
@@ -8,7 +9,7 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/ssl:/etc/nginx/ssl
-      - frontend-build:/var/www/react-build
+      - frontend-build:/var/www/react-build # Use the named volume here
     depends_on:
       - frontend
       - backend
@@ -24,9 +25,9 @@ services:
       - "8082"
     environment:
       - NODE_ENV=production
-      - MONGO_URI=mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin
-      - JWT_SECRET=BFEec8JKk:FZz3f0F812f.0051293f
-      - COOKIE_NAME=token
+      - MONGO_URI=mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongo:27017/${MONGO_DB_NAME}?authSource=${MONGO_DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - COOKIE_NAME=${COOKIE_NAME}
     depends_on:
       - mongo
     networks:
@@ -38,26 +39,29 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - frontend-build:/usr/share/nginx/html
+      - frontend-build:/usr/share/nginx/html # Write to the named volume
     networks:
       - app_network
-    restart: always
+    # No restart policy needed; this container builds and exits.
 
   mongo:
-    image: mongo:latest
+    image: mongo:6.0 # Pin a specific version, don't use :latest
     restart: always
-    ports:
-      - "27017:27017" 
+    # ports:
+    #   - "27017:27017" # Exposing the DB is a security risk. Uncomment for local debugging if needed.
     volumes:
       - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro # Mount the init script
     networks:
       - app_network
     environment:
-      MONGO_INITDB_ROOT_USERNAME: badisjl99
-      MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
 networks:
   app_network:
     driver: bridge
+
 volumes:
   mongo-data:
   frontend-build:

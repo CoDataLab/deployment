@@ -1,30 +1,16 @@
-db = db.getSiblingDB('mydb')  // Use 'mydb' database
+// /mongo-init.js
 
-db.createUser(
-  {
-    user: "myuser",           // Application User
-    pwd:  "securepassword", // Strong Password
-    roles: [
-      { role: "readWrite", db: "mydb" } // Only read/write access to 'mydb'
-    ]
-  }
-);
+// Switch to the application database. MongoDB will create it if it doesn't exist.
+db = db.getSiblingDB('mydb');
 
-// Create another user just for reading (example)
-db.createUser(
-  {
-    user: "readonlyuser",
-    pwd:  "verysecurepassword",
-    roles: [
-      { role: "read", db: "mydb" }
-    ]
-  }
-);
-
-db.getSiblingDB('admin').createUser(
-  {
-    user: "admin",
-    pwd: "supersecureadminpassword",
-    roles: [ { role: "root", db: "admin" } ]
-  }
-);
+// Create a non-root user with read/write permissions for the application
+db.createUser({
+  user: 'badis',
+  pwd: '123321@00Pkdz?;fde07', // This password must match MONGO_APP_PASSWORD in your .env file
+  roles: [
+    {
+      role: 'readWrite',
+      db: 'mydb',
+    },
+  ],
+});
