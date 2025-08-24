@@ -47,8 +47,8 @@ services:
   mongo:
     image: mongo:6.0 # Pin a specific version, don't use :latest
     restart: always
-    # ports:
-    #   - "27017:27017" # Exposing the DB is a security risk. Uncomment for local debugging if needed.
+    ports:
+     - "27017:27017" # Exposing the DB is a security risk. Uncomment for local debugging if needed.
     volumes:
       - mongo-data:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro # Mount the init script
