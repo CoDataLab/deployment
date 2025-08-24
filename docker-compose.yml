@@ -8,11 +8,10 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
-      - app-net
+      - app-network
     environment:
-      MONGO_INITDB_ROOT_USERNAME: badisjl99
+      MONGO_INITDB_ROOT_USERNAME: badisjl99 
       MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
 
   backend:
@@ -23,16 +22,14 @@ services:
     restart: unless-stopped
     depends_on:
       - mongo
-    expose:
-      - "8082"
     ports:
       - "8082:8082"
     networks:
-      - app-net
+      - app-network
     environment:
       NODE_ENV: production
       PORT: 8082
-      MONGO_URI: mongodb://badisjl99:123951Ba008@51.91.249.118:27017/mydb
+      MONGO_URI: mongodb://badisjl99:123951Ba008@mongo:27017/mydb
       JWT_SECRET: BFEec8JKk:FZz3f0F812f.0051293f
       COOKIE_NAME: token
 
@@ -51,7 +48,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/www/certbot
     networks:
-      - app-net
+      - app-network
 
   certbot:
     image: certbot/certbot:latest
@@ -60,7 +57,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/www/certbot
     networks:
-      - app-net
+      - app-network
 
 volumes:
   mongo-data:
@@ -68,5 +65,5 @@ volumes:
   certbot-var:
 
 networks:
-  app-net:
+  app-network:
     driver: bridge
