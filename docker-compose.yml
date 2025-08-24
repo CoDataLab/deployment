@@ -1,40 +1,39 @@
 services:
   mongo:
-      image: mongo:latest
-      restart: always
-      ports:
-        - "27017:27017"
-      volumes:
-        - mongo-data:/data/db
-        - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      networks:
-        - app-net
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: badisjl99
-        MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - app-net
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: badisjl99
+      MONGO_INITDB_ROOT_PASSWORD: 123951Ba008
 
   backend:
-  build:
-    context: ./backend
-    dockerfile: Dockerfile
-  container_name: backend
-  restart: unless-stopped
-  depends_on:
-    - mongo
-  expose:
-    - "8082"
-  ports:
-    - "8082:8082"
-  networks:
-    - app-net
-  environment:
-    NODE_ENV: production
-    PORT: 8082
-    MONGO_URI: mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin
-    JWT_SECRET: BFEec8JKk:FZz3f0F812f.0051293f
-    COOKIE_NAME: token
-
-    
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    expose:
+      - "8082"
+    ports:
+      - "8082:8082"
+    networks:
+      - app-net
+    environment:
+      NODE_ENV: production
+      PORT: 8082
+      MONGO_URI: mongodb://badisjl99:123951Ba008@mongo:27017/mydb?authSource=admin
+      JWT_SECRET: BFEec8JKk:FZz3f0F812f.0051293f
+      COOKIE_NAME: token
 
   web:
     build:
@@ -43,10 +42,11 @@ services:
     container_name: web
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     ports:
       - "80:80"
-      - "443:443"   # <-- added HTTPS port
+      - "443:443"
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/www/certbot
