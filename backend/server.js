@@ -40,7 +40,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
     cors: {
-        origin: ["http://localhost:3031", "https://codatalab.vercel.app", "https://codatalab-badis-s-projects.vercel.app", "https://codatalab.cloud","http://codatalab.cloud"],
+        origin: ["https://www.codatalab.cloud","https://codatalab.cloud"],
         methods: ["GET", "POST"],
         credentials: true
     }

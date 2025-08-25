@@ -5,7 +5,7 @@ const User = require('../models/User');
 const { generateToken, verifyToken ,authenticateToken} = require('../utils/jwt');
 
 
-
+/*
 router.post('/register', async (req, res, next) => {
   const { fullName, email, password, role } = req.body;
 
@@ -39,7 +39,7 @@ router.post('/register', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+});*/
 
 router.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
@@ -60,7 +60,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     const token = generateToken(user._id);
-    res.status(200).json({ message: 'Login successful', token,user });
+    res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
