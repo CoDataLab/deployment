@@ -2,14 +2,20 @@ version: "3.8"
 
 services:
   nginx:
+  nginx:
     image: nginx:stable-alpine
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - frontend-build:/var/www/react-build # Use the named volume here
+      # REMOVE the old self-signed SSL mount
+      # - ./nginx/ssl:/etc/nginx/ssl 
+      
+      # ADD the Let's Encrypt volume (read-only is good practice)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
+      - frontend-build:/var/www/react-build
     depends_on:
       - frontend
       - backend
