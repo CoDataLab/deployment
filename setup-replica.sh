@@ -67,9 +67,9 @@ if [ ! -f ".env" ]; then
     echo "⚠️  Creating sample .env file - PLEASE UPDATE WITH YOUR VALUES!"
     cat > .env << 'EOF'
 MONGO_ROOT_USER=root
-MONGO_ROOT_PASSWORD=your_strong_root_password_here
-JWT_SECRET=your_jwt_secret_here
-COOKIE_NAME=your_cookie_name_here
+MONGO_ROOT_PASSWORD=12345Snake99
+JWT_SECRET=BFEec8JKk:FZz3f0F812f.0051293f
+COOKIE_NAME=token
 EOF
     echo "🔧 Please edit .env file with your actual values before proceeding!"
 else
