@@ -1,6 +1,5 @@
 const SourceGroup = require("../models/SourceGroup");
 const Source = require('../models/Source');
-const {createGroupsForAllCategories }= require('../utils/sourceGrouper')
 const express = require('express');
 const router = express.Router();
 
@@ -16,35 +15,40 @@ router.get('/all', async (req, res) => {
     // Check cache
     const cachedGroups = cache.get("allSourceGroups");
     if (cachedGroups) {
-      return res.json({ message: 'Source groups retrieved successfully. (cached)', groups: cachedGroups });
+      return res.json({
+        message: 'Source groups retrieved successfully. (cached)',
+        groups: cachedGroups
+      });
     }
 
+    // Get all sources
     const sources = await Source.find();
     const allSourceIds = sources.map(source => source._id);
     const totalCount = sources.length;
-        
+
+    // Update or create the "All Sources" group
     let allSourcesGroup = await SourceGroup.findOne({ name: 'All Sources' });
     if (allSourcesGroup) {
       allSourcesGroup.sourceIds = allSourceIds;
       allSourcesGroup.totalCount = totalCount;
-      allSourcesGroup.markModified('sourceIds');
-      allSourcesGroup.markModified('totalCount');
       await allSourcesGroup.save();
     } else {
       allSourcesGroup = new SourceGroup({
         name: 'All Sources',
         sourceIds: allSourceIds,
-        totalCount: totalCount
+        totalCount
       });
       await allSourcesGroup.save();
     }
 
+    // Create groups for categories
     await createGroupsForAllCategories();
 
+    // Fetch all groups and populate
     const groups = await SourceGroup.find().populate('sourceIds');
 
     // Save to cache with 3 min TTL
-    cache.set("allSourceGroups", groups);
+    cache.set("allSourceGroups", groups, 180);
 
     res.json({ message: 'Source groups retrieved successfully.', groups });
   } catch (error) {
@@ -117,4 +121,38 @@ router.get('/group-count/:id', async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch source group.', error: error.message });
     }
 });
+
+async function createGroupsForAllCategories() {
+  try {
+    // Get all sources
+    const sources = await Source.find();
+
+    // Group by category
+    const categoryGroups = {};
+    for (const src of sources) {
+      const cat = src.category || 'Uncategorized';
+      if (!categoryGroups[cat]) categoryGroups[cat] = [];
+      categoryGroups[cat].push(src._id);
+    }
+
+    // Upsert each category group
+    for (const [category, ids] of Object.entries(categoryGroups)) {
+      let group = await SourceGroup.findOne({ name: category });
+      if (group) {
+        group.sourceIds = ids;
+        group.totalCount = ids.length;
+        await group.save();
+      } else {
+        await new SourceGroup({
+          name: category,
+          sourceIds: ids,
+          totalCount: ids.length
+        }).save();
+      }
+    }
+  } catch (err) {
+    console.error("Error creating category groups:", err.message);
+  }
+}
+
 module.exports = router;
