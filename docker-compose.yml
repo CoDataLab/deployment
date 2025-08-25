@@ -1,7 +1,5 @@
 version: "3.8"
-
 services:
-
   nginx:
     image: nginx:stable-alpine
     ports:
@@ -9,12 +7,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      # REMOVE the old self-signed SSL mount
-      # - ./nginx/ssl:/etc/nginx/ssl 
-      
-      # ADD the Let's Encrypt volume (read-only is good practice)
       - /etc/letsencrypt:/etc/letsencrypt:ro
-
       - frontend-build:/var/www/react-build
     depends_on:
       - frontend
@@ -31,11 +24,13 @@ services:
       - "8082"
     environment:
       - NODE_ENV=production
-      - MONGO_URI=mongodb://badis:12332Mps100Pk3dzfde07@mongo:27017/mydb?authSource=mydb
+      - MONGO_URI=mongodb://badis:12332Mps100Pk3dzfde07@mongo1:27017,mongo2:27017,mongo3:27017/mydb?authSource=mydb&replicaSet=rs0
       - JWT_SECRET=${JWT_SECRET}
       - COOKIE_NAME=${COOKIE_NAME}
     depends_on:
-      - mongo
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - app_network
     restart: always
@@ -45,29 +40,89 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - frontend-build:/usr/share/nginx/html # Write to the named volume
+      - frontend-build:/usr/share/nginx/html
     networks:
       - app_network
-    # No restart policy needed; this container builds and exits.
 
-  mongo:
-    image: mongo:6.0 # Pin a specific version, don't use :latest
+  # Primary MongoDB instance
+  mongo1:
+    image: mongo:6.0
+    hostname: mongo1
+    container_name: mongo1
     restart: always
     ports:
-     - "27017:27017" # Exposing the DB is a security risk. Uncomment for local debugging if needed.
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro # Mount the init script
+      - mongo1-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongo-keyfile:/opt/keyfile/mongo-keyfile:ro
     networks:
       - app_network
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    command: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/opt/keyfile/mongo-keyfile"]
+
+  # Secondary MongoDB instance 1
+  mongo2:
+    image: mongo:6.0
+    hostname: mongo2
+    container_name: mongo2
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2-data:/data/db
+      - ./mongo-keyfile:/opt/keyfile/mongo-keyfile:ro
+    networks:
+      - app_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    command: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/opt/keyfile/mongo-keyfile"]
+    depends_on:
+      - mongo1
+
+  # Secondary MongoDB instance 2
+  mongo3:
+    image: mongo:6.0
+    hostname: mongo3
+    container_name: mongo3
+    restart: always
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo3-data:/data/db
+      - ./mongo-keyfile:/opt/keyfile/mongo-keyfile:ro
+    networks:
+      - app_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    command: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/opt/keyfile/mongo-keyfile"]
+    depends_on:
+      - mongo1
+
+  # MongoDB replica set initialization
+  mongo-setup:
+    image: mongo:6.0
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./replica-setup.js:/scripts/replica-setup.js:ro
+    networks:
+      - app_network
+    entrypoint: ["bash", "-c", "sleep 10 && mongosh --host mongo1:27017 --authenticationDatabase admin -u ${MONGO_ROOT_USER} -p ${MONGO_ROOT_PASSWORD} --file /scripts/replica-setup.js && exit 0"]
+    restart: "no"
 
 networks:
   app_network:
     driver: bridge
 
 volumes:
-  mongo-data:
+  mongo1-data:
+  mongo2-data:
+  mongo3-data:
   frontend-build:
