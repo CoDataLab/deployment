@@ -58,7 +58,7 @@ services:
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
       - app_network
-    command: redis-server /usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
