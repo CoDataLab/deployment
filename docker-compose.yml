@@ -27,10 +27,12 @@ services:
       - MONGO_URI=mongodb://badis:12332Mps100Pk3dzfde07@mongo1:27017,mongo2:27017,mongo3:27017/mydb?authSource=mydb&replicaSet=rs0
       - JWT_SECRET=${JWT_SECRET}
       - COOKIE_NAME=${COOKIE_NAME}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
     depends_on:
       - mongo1
       - mongo2
       - mongo3
+      - redis
     networks:
       - app_network
     restart: always
@@ -43,6 +45,23 @@ services:
       - frontend-build:/usr/share/nginx/html
     networks:
       - app_network
+
+  # Redis server with authentication
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - app_network
+    command: redis-server /usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
 
   # Primary MongoDB instance
   mongo1:
@@ -125,4 +144,5 @@ volumes:
   mongo1-data:
   mongo2-data:
   mongo3-data:
+  redis-data:
   frontend-build:
