@@ -1,7 +1,7 @@
 # File: docker-compose.yml
 
 services:
-nginx:
+  nginx:
     image: nginx:stable-alpine
     ports:
       - "80:80"
