@@ -7,14 +7,13 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl:ro  # Ensure nginx can read the certs
       - frontend-build:/var/www/react-build
-      - ./certbot/www:/var/www/certbot:ro
     depends_on:
       - frontend
       - backend
-      - storage
+      - storage # Nginx should depend on storage too
     networks:
       - app_network
     restart: always
