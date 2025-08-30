@@ -12,31 +12,38 @@ server {
     listen 80;
     server_name codatalab.cloud;
     
-    # Redirect HTTP to HTTPS
+    # This location block is important for Let's Encrypt certificate renewal
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Redirect all other HTTP traffic to HTTPS
     location / {
         return 301 https://$host$request_uri;
     }
 }
 
 server {
-    listen 443 ssl;
+    listen 443 ssl http2;
     server_name codatalab.cloud;
 
-    # SSL configuration
-    ssl_certificate /etc/nginx/ssl/cert.pem;
-    ssl_certificate_key /etc/nginx/ssl/key.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+    # --- THIS IS THE CRUCIAL FIX ---
+    # Point to your real Let's Encrypt certificates
+    ssl_certificate /etc/letsencrypt/live/codatalab.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/codatalab.cloud/privkey.pem;
 
-    # Frontend
+    # Include the recommended security settings from Let's Encrypt/Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Frontend (React App)
     location / {
         root /var/www/react-build;
         index index.html;
         try_files $uri $uri/ /index.html;
     }
 
-    # Backend API
+    # Backend API (Node.js)
     location /api/ {
         proxy_pass http://backend:8082/;
         proxy_http_version 1.1;
@@ -49,22 +56,15 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
-    # +++ ADDED SECTION START +++
-    # Storage Service API
+    # Storage Service API (Python/FastAPI)
     location /api/storage/ {
-        # Forward requests to the 'storage' container on port 8000
-        # The trailing slash removes '/api/storage' from the request URI
         proxy_pass http://storage:8000/;
-
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
-        # IMPORTANT: Allow larger file uploads for images
         client_max_body_size 20M;
     }
-    # +++ ADDED SECTION END +++
 }
 EOF
 

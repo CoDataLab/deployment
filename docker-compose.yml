@@ -1,19 +1,20 @@
 # File: docker-compose.yml
 
 services:
-  nginx:
+nginx:
     image: nginx:stable-alpine
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl:ro  # Ensure nginx can read the certs
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - frontend-build:/var/www/react-build
+      - ./certbot/www:/var/www/certbot:ro
     depends_on:
       - frontend
       - backend
-      - storage # Nginx should depend on storage too
+      - storage
     networks:
       - app_network
     restart: always
