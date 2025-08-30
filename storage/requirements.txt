@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy[asyncio]
+asyncpg           # Async driver for PostgreSQL
+pydantic
+pydantic-settings
+aiofiles
+python-multipart
+Pillow
+

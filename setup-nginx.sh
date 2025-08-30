@@ -1,4 +1,6 @@
 #!/bin/bash
+# File: setup-nginx.sh
+
 # Create directories
 mkdir -p ./nginx/ssl
 mkdir -p ./nginx/conf.d
@@ -46,13 +48,37 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
     }
+
+    # +++ ADDED SECTION START +++
+    # Storage Service API
+    location /api/storage/ {
+        # Forward requests to the 'storage' container on port 8000
+        # The trailing slash removes '/api/storage' from the request URI
+        proxy_pass http://storage:8000/;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # IMPORTANT: Allow larger file uploads for images
+        client_max_body_size 20M;
+    }
+    # +++ ADDED SECTION END +++
 }
 EOF
 
 # Generate self-signed SSL certificate for development
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout ./nginx/ssl/key.pem \
-  -out ./nginx/ssl/cert.pem \
-  -subj "/CN=codatalab.cloud"
+# Only generate if they don't exist to avoid overwriting
+if [ ! -f "./nginx/ssl/key.pem" ] || [ ! -f "./nginx/ssl/cert.pem" ]; then
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout ./nginx/ssl/key.pem \
+    -out ./nginx/ssl/cert.pem \
+    -subj "/CN=codatalab.cloud"
+  echo "Generated new self-signed SSL certificates."
+else
+  echo "SSL certificates already exist. Skipping generation."
+fi
 
-echo "Nginx configuration and SSL certificates have been set up."
+
+echo "Nginx configuration has been set up."

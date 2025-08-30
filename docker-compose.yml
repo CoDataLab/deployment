@@ -1,3 +1,5 @@
+# File: docker-compose.yml
+
 services:
   nginx:
     image: nginx:stable-alpine
@@ -6,11 +8,12 @@ services:
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro  # Ensure nginx can read the certs
       - frontend-build:/var/www/react-build
     depends_on:
       - frontend
       - backend
+      - storage # Nginx should depend on storage too
     networks:
       - app_network
     restart: always
@@ -45,7 +48,33 @@ services:
     networks:
       - app_network
 
-  # Redis server with authentication
+  # +++ ADDED SECTION START +++
+  storage:
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      # This URL uses service names, which Docker Compose resolves to internal IPs
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      - postgres
+    networks:
+      - app_network
+
+  postgres:
+    image: postgres:15-alpine
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
   redis:
     image: redis:7-alpine
     hostname: redis
@@ -145,3 +174,4 @@ volumes:
   mongo3-data:
   redis-data:
   frontend-build:
+  postgres-data: # <-- ADDED THIS
